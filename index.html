@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="AIへの指示を場面別テンプレートと、図解つきのイラスト生成キーワードで引ける早見表。">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>プロンプト早見帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=JetBrains+Mono:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: sticky section tabs + search; reference cards (demo on top, copyable snippet below), like a CSS property reference */
+:root{
+  --bg:#EEF2F5; --surface:#FFFFFF; --sunken:#F5F7FA;
+  --ink:#152230; --muted:#5A6877; --line:#D8DFE7;
+  --accent:#0C7A68; --accent-soft:#D5EFE9; --mark:#FFE45C; --mark-ink:#3A3000;
+  --bad:#B4413A; --bad-soft:#F8E3E1; --good:#0C7A68; --good-soft:#DDF2EC;
+  --sky:#DDEBF6; --gnd:#CFE3C8; --leaf:#8CC08A; --trunk:#9A7354; --skin:#FFFFFF; --hair:#2B3644;
+  --f-display:"Dela Gothic One","Hiragino Sans","Noto Sans JP",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F151C; --surface:#161E28; --sunken:#121921;
+  --ink:#E4EAF0; --muted:#97A4B3; --line:#283340;
+  --accent:#3CC4A6; --accent-soft:#16352F; --mark:#E8C93A; --mark-ink:#1E1800;
+  --bad:#F08A80; --bad-soft:#3A1F1D; --good:#3CC4A6; --good-soft:#15332D;
+  --sky:#1E2C3A; --gnd:#22352A; --leaf:#4E8A57; --trunk:#7A5A42; --skin:#E4EAF0; --hair:#0F151C;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F151C; --surface:#161E28; --sunken:#121921;
+  --ink:#E4EAF0; --muted:#97A4B3; --line:#283340;
+  --accent:#3CC4A6; --accent-soft:#16352F; --mark:#E8C93A; --mark-ink:#1E1800;
+  --bad:#F08A80; --bad-soft:#3A1F1D; --good:#3CC4A6; --good-soft:#15332D;
+  --sky:#1E2C3A; --gnd:#22352A; --leaf:#4E8A57; --trunk:#7A5A42; --skin:#E4EAF0; --hair:#0F151C;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7}
+.wrap{max-width:1160px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+p{margin:0}
+code,pre,.mono{font-family:var(--f-mono)}
+
+header.top{padding-block:40px 20px}
+.top h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,6vw,48px);line-height:1.15;letter-spacing:.02em}
+.top h1 .hl{background:linear-gradient(transparent 58%,var(--mark) 58%);color:inherit}
+.top p{color:var(--muted);margin-top:10px;max-width:62ch}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-block:10px}
+.tabs .links{display:flex;gap:4px;flex-wrap:wrap;flex:1 1 auto}
+.tabs a{color:var(--muted);text-decoration:none;font-weight:500;font-size:14px;padding:6px 12px;border-radius:999px}
+.tabs a:hover{color:var(--ink);background:var(--surface)}
+.tabs a.on{color:var(--accent);background:var(--accent-soft)}
+.search{flex:0 1 260px;min-width:0;position:relative}
+.search input{width:100%;font:inherit;font-size:14px;padding:7px 12px 7px 32px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+section{padding-block:44px 8px;scroll-margin-top:70px}
+.sec-head{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
+.sec-head .eyebrow{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:700}
+.sec-head h2{font-family:var(--f-display);font-weight:400;font-size:clamp(22px,3.6vw,30px);line-height:1.25}
+.sec-head p{color:var(--muted);max-width:66ch}
+h3.group{font-size:17px;font-weight:700;margin:30px 0 12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h3.group small{font-weight:400;color:var(--muted);font-size:13px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.grid.wide{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+@media (max-width:420px){.grid,.grid.wide{grid-template-columns:1fr}}
+
+/* copy row */
+.copybox{position:relative}
+.cp{font:inherit;font-size:12px;font-weight:700;color:var(--accent);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:3px 9px;cursor:pointer;white-space:nowrap}
+.cp:hover{border-color:var(--accent)}
+.cp:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cp.done{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+
+/* rules */
+.rules{display:flex;flex-direction:column;gap:12px}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;grid-template-columns:200px 1fr 1fr;gap:14px;align-items:start}
+.rule h4{font-size:15px;font-weight:700}
+.rule h4 + p{font-size:13px;color:var(--muted);margin-top:4px}
+.ex{border-radius:8px;padding:10px 12px;font-size:14px;min-width:0}
+.ex b{display:block;font-size:11px;letter-spacing:.1em;margin-bottom:2px}
+.ex.bad{background:var(--bad-soft)} .ex.bad b{color:var(--bad)}
+.ex.good{background:var(--good-soft)} .ex.good b{color:var(--good)}
+@media (max-width:760px){.rule{grid-template-columns:1fr}}
+
+/* templates */
+.tpl{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);display:flex;flex-direction:column;min-width:0}
+.tpl-h{padding:14px 16px 8px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.tpl-h .cat{font-size:11px;letter-spacing:.1em;color:var(--accent);font-weight:700}
+.tpl-h h4{font-size:16px;font-weight:700;margin-top:1px}
+.tpl-h p{font-size:13px;color:var(--muted)}
+.tpl pre{margin:0 12px 12px;padding:12px 14px;background:var(--sunken);border-radius:8px;font-size:12.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word;flex:1}
+mark{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:0 2px}
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cat-tabs button{font:inherit;font-size:13px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.cat-tabs button[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+
+/* illustration formula */
+.formula{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{display:inline-flex;flex-direction:column;padding:6px 10px;border-radius:8px;font-size:13px;line-height:1.35;border:1px solid transparent}
+.chip small{font-size:10.5px;opacity:.75;letter-spacing:.06em}
+.chip.c1{background:#FDE2E4;color:#7A1F2A}.chip.c2{background:#FFEBD2;color:#6E3B00}.chip.c3{background:#FFF6C7;color:#5A4A00}
+.chip.c4{background:#DDF3DA;color:#1F5521}.chip.c5{background:#D8EEF8;color:#0D4A66}.chip.c6{background:#E4E1FA;color:#352C80}
+.chip.c7{background:#F6DDF1;color:#6E1F5E}.chip.c8{background:#E5E9EE;color:#2E3A47}
+.arrow{color:var(--muted);font-size:12px}
+.formula .sample{margin-top:14px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;background:var(--sunken);border-radius:8px;padding:12px 14px}
+.formula .sample pre{margin:0;font-size:13px;white-space:pre-wrap;word-break:break-word;min-width:0}
+.sample .s1{color:#C0394B}.sample .s2{color:#B06200}.sample .s3{color:#8A7400}.sample .s4{color:#2E7D32}.sample .s5{color:#1A6C93}.sample .s6{color:#5145B5}.sample .s7{color:#A33489}.sample .s8{color:var(--muted)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .sample [class^="s"]{filter:brightness(1.6) saturate(.8)}}
+:root[data-theme="dark"] .sample [class^="s"]{filter:brightness(1.6) saturate(.8)}
+
+/* keyword cards */
+.kw{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.demo{aspect-ratio:4/3;background:var(--sky);position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.demo svg{width:100%;height:100%;display:block}
+.kw-b{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.kw-b h4{font-size:15px;font-weight:700;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+.kw-b h4 .en{font-family:var(--f-mono);font-size:12px;font-weight:400;color:var(--muted)}
+.kw-b p{font-size:13px;color:var(--muted);flex:1}
+.snip{display:flex;gap:8px;align-items:center;justify-content:space-between;background:var(--sunken);border-radius:6px;padding:5px 6px 5px 10px}
+.snip code{font-size:12px;overflow-wrap:anywhere;min-width:0}
+
+/* figure svg parts */
+.gnd{fill:var(--gnd)} .leaf{fill:var(--leaf)} .trunk{fill:var(--trunk)} .sun{fill:var(--mark)}
+.body,.head{fill:var(--skin);stroke:var(--ink);stroke-width:2.2}
+.limb{stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;fill:none}
+.eye{fill:var(--ink)} .mouth{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round}
+.hair{fill:var(--hair);stroke:var(--ink);stroke-width:1.5}
+.cam{fill:var(--accent)} .sight{stroke:var(--accent);stroke-width:1.4;stroke-dasharray:3 3;fill:none}
+.guide{stroke:var(--muted);stroke-width:.6;stroke-dasharray:2 2;opacity:.7;fill:none}
+.ln{stroke:var(--ink);stroke-width:1.5;fill:none}
+.acc{fill:var(--accent)} .accs{stroke:var(--accent);fill:none;stroke-width:2}
+.soft{fill:var(--muted);opacity:.35}
+
+/* lighting demos (literal colours: they depict the light itself) */
+.lt{position:absolute;inset:0}
+.orb{position:absolute;width:42%;aspect-ratio:1;border-radius:50%;left:29%;top:20%}
+.floor{position:absolute;left:0;right:0;bottom:0;height:18%}
+.l-back{background:radial-gradient(circle at 50% 42%,#FFF8E0 0 18%,#FFD98A 34%,#C9894A 70%,#5A3A22)}
+.l-back .orb{background:#2A1E16;box-shadow:0 0 0 2px rgba(255,240,200,.9),0 0 24px 8px rgba(255,220,150,.8)}
+.l-back .floor{background:#3A281B}
+.l-rim{background:#12161C}
+.l-rim .orb{background:#1C232C;box-shadow:inset 7px -3px 6px -2px #CFE8FF,inset -7px -3px 6px -2px #CFE8FF,0 0 14px rgba(160,210,255,.35)}
+.l-gold{background:linear-gradient(180deg,#F6B26B,#F28C7A 60%,#9A5B7C)}
+.l-gold .orb{background:radial-gradient(circle at 30% 65%,#FFE0A6,#E9965A 55%,#7C3F3A)}
+.l-gold .floor{background:#6B3E4E}
+.l-soft{background:#EEF0F4}
+.l-soft .orb{background:radial-gradient(circle at 42% 38%,#FFFFFF,#E3E7EE 60%,#C9CFD9);box-shadow:0 10px 24px rgba(80,90,110,.15)}
+.l-soft .floor{background:#E2E5EB}
+.l-drama{background:#0B0B0D}
+.l-drama .orb{background:linear-gradient(100deg,#F4F1EA 0 38%,#6B6660 50%,#0B0B0D 62%)}
+.l-neon{background:#0E0B24}
+.l-neon .orb{background:#17132E;box-shadow:inset 10px 0 12px -4px #FF3DD8,inset -10px 0 12px -4px #2FE6FF,-6px 0 22px rgba(255,61,216,.55),6px 0 22px rgba(47,230,255,.55)}
+.l-neon .floor{background:linear-gradient(90deg,#3A0F4A,#0B2F45)}
+.l-vol{background:linear-gradient(180deg,#1A2230,#2C3646)}
+.l-vol::before{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(115deg,rgba(255,240,200,0) 0 22px,rgba(255,240,200,.22) 22px 34px);transform:skewX(-8deg)}
+.l-vol .orb{background:radial-gradient(circle at 35% 30%,#C9D2DE,#5D6B7E 70%);width:30%;left:35%;top:40%}
+.l-bokeh{background:#23324A}
+.l-bokeh i{position:absolute;border-radius:50%;filter:blur(5px);opacity:.75}
+.l-bokeh .orb{background:radial-gradient(circle at 40% 35%,#FFF,#F6C35B 45%,#B5701F);width:34%;left:33%;top:28%;box-shadow:0 0 0 1.5px #fff8}
+
+/* aspect boxes */
+.ar-wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:12%}
+.ar{background:var(--surface);border:2px solid var(--accent);border-radius:4px;max-width:100%;max-height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-weight:600;color:var(--accent);font-size:13px}
+
+/* swatches */
+.sw{display:flex;height:100%}
+.sw span{flex:1}
+
+/* tips */
+.tips{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+@media (max-width:420px){.tips{grid-template-columns:1fr}}
+.tip{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.tip h4{font-size:15px}
+.tip p{font-size:13.5px;color:var(--muted)}
+.tip .ex{font-size:13px}
+.tip .ex code{font-size:12px;overflow-wrap:anywhere}
+
+.wordbank{display:flex;flex-wrap:wrap;gap:8px}
+.word{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 12px;font-size:13px}
+.word code{font-size:11.5px;color:var(--muted)}
+.word .cp{padding:1px 7px;font-size:11px}
+
+/* tools table */
+.tbl-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13.5px}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:700;background:var(--sunken)}
+tr:last-child td{border-bottom:none}
+td code{font-size:12px;background:var(--sunken);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+td strong{display:block;font-size:14px}
+td small{color:var(--muted)}
+
+/* builder */
+.builder{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.builder{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12.5px;font-weight:700;color:var(--muted)}
+.field input,.field select{font:inherit;font-size:14px;padding:7px 10px;border-radius:7px;border:1px solid var(--line);background:var(--sunken);color:var(--ink);width:100%}
+.field input:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.out{display:flex;flex-direction:column;gap:6px}
+.out-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.out-h b{font-size:13px}
+.out-h small{color:var(--muted);font-weight:400;margin-left:6px}
+.out pre{margin:0;background:var(--sunken);border-radius:8px;padding:12px 14px;font-size:13px;white-space:pre-wrap;word-break:break-word;min-height:3em}
+
+.empty{color:var(--muted);padding:20px 0;display:none}
+footer{padding-block:48px 40px;color:var(--muted);font-size:12.5px}
+.is-hidden{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="wc"><feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/><feGaussianBlur stdDeviation="0.7"/></filter>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <h1>プロンプト<span class="hl">早見帳</span></h1>
+    <p>AIへの指示を「やりたいこと」から引ける早見表です。テンプレートは【　】の部分を書き換えて使います。イラスト生成のキーワードは、見本の図で効果を確かめてからコピーできます。</p>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="セクション">
+  <div class="wrap">
+    <div class="links">
+      <a href="#rules">基本の5か条</a>
+      <a href="#templates">場面別テンプレ</a>
+      <a href="#illust">イラスト生成</a>
+      <a href="#tools">ツール別の書き方</a>
+      <a href="#builder">組み立て機</a>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" placeholder="キーワードで絞り込み（例：逆光、バグ）" aria-label="キーワードで絞り込み">
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section id="rules">
+  <div class="sec-head">
+    <span class="eyebrow">どんな指示にも効く</span>
+    <h2>基本の5か条＋2</h2>
+    <p>迷ったらこの順に足していくだけで、ほとんどの指示は伝わりやすくなります。</p>
+  </div>
+  <div class="rules" id="rulesList"></div>
+</section>
+
+<section id="templates">
+  <div class="sec-head">
+    <span class="eyebrow">コピーして【　】を埋めるだけ</span>
+    <h2>場面別テンプレート</h2>
+    <p>使わない行は消してかまいません。黄色の部分が書き換えるところです。</p>
+  </div>
+  <div class="cat-tabs" id="catTabs" role="group" aria-label="カテゴリ"></div>
+  <div class="grid wide" id="tplList"></div>
+</section>
+
+<section id="illust">
+  <div class="sec-head">
+    <span class="eyebrow">画像生成AI</span>
+    <h2>イラスト生成の書き方</h2>
+    <p>画像生成では「何を・どう撮るか・どんな光で・どんな画風で」を分けて書くのがコツです。下のキーワードは図で効果を示しています。英語キーワードはどのツールでも通じやすいです。</p>
+  </div>
+
+  <div class="formula" data-s="語順 基本 構造 順番">
+    <h3 class="group" style="margin-top:0">基本の語順 <small>大事なものほど前に。前に書いた言葉ほど強く効きます</small></h3>
+    <div class="chips">
+      <span class="chip c1"><small>1 主題</small>誰が・何が</span><span class="arrow">→</span>
+      <span class="chip c2"><small>2 動き・表情</small>何をしている</span><span class="arrow">→</span>
+      <span class="chip c3"><small>3 細部</small>服・持ち物・特徴</span><span class="arrow">→</span>
+      <span class="chip c4"><small>4 場所・背景</small>どこで・いつ</span><span class="arrow">→</span>
+      <span class="chip c5"><small>5 構図・カメラ</small>寄り/引き・角度</span><span class="arrow">→</span>
+      <span class="chip c6"><small>6 光</small>光の向き・時間帯</span><span class="arrow">→</span>
+      <span class="chip c7"><small>7 画風・色</small>水彩・アニメ調など</span><span class="arrow">→</span>
+      <span class="chip c8"><small>8 仕上げ</small>比率・画質</span>
+    </div>
+    <div class="sample copybox">
+      <pre class="copy-src"><span class="s1">a young girl with short black hair</span>, <span class="s2">reading a book and smiling</span>, <span class="s3">wearing a yellow raincoat</span>, <span class="s4">sitting by a café window on a rainy evening</span>, <span class="s5">medium shot, eye level</span>, <span class="s6">warm soft light from the window</span>, <span class="s7">watercolor illustration, muted pastel colors</span>, <span class="s8">16:9</span></pre>
+      <button class="cp" type="button">コピー</button>
+    </div>
+  </div>
+
+  <div id="kwGroups"></div>
+
+  <h3 class="group">伝わりやすくするコツ <small>画像生成ならではのポイント</small></h3>
+  <div class="tips" id="tipsList"></div>
+
+  <h3 class="group">よく使う画風・質感ワード <small>見本の図はありませんが、そのまま使えます</small></h3>
+  <div class="wordbank" id="wordBank"></div>
+</section>
+
+<section id="tools">
+  <div class="sec-head">
+    <span class="eyebrow">同じ絵でも書き方が違う</span>
+    <h2>ツール別の書き方</h2>
+    <p>会話型のAIは文章で、キーワード型のAIは単語の羅列で書くとうまくいきます。仕様は更新されることがあるので、細かいパラメータは各ツールの公式ガイドも確認してください。</p>
+  </div>
+  <div class="tbl-wrap" data-s="ChatGPT Gemini Midjourney Stable Diffusion ツール パラメータ ネガティブ">
+    <table>
+      <thead><tr><th style="width:18%">ツール</th><th style="width:26%">書き方のコツ</th><th style="width:28%">強調・除外のしかた</th><th>書き方の例</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>ChatGPT（画像生成）</strong><small>会話型</small></td>
+          <td>日本語の文章でOK。「誰が・どこで・どんな雰囲気で」を普通に説明する。直したいところは会話で伝える。</td>
+          <td>「〜は入れないで」と文章で書ける。入れたい文字は <code>"　"</code> で囲む。</td>
+          <td><code>雨の夕方、カフェの窓辺で本を読む女の子を水彩画風で。横長16:9。看板に"OPEN"の文字を入れて。</code></td>
+        </tr>
+        <tr>
+          <td><strong>Gemini（画像生成）</strong><small>会話型</small></td>
+          <td>ChatGPTと同じく文章でOK。元の画像を渡して「ここだけ変えて」という部分修正が得意。</td>
+          <td>文章で指示。「人物はそのまま、背景だけ〜」のように残すものを明記する。</td>
+          <td><code>この写真の人物はそのままで、背景だけ夕暮れの海辺に変えて。</code></td>
+        </tr>
+        <tr>
+          <td><strong>Midjourney</strong><small>キーワード型</small></td>
+          <td>英語のキーワードをカンマ区切りで。末尾にパラメータを付ける。</td>
+          <td><code>--ar 16:9</code> 比率 ／ <code>--no text</code> 除外 ／ <code>--s 250</code> 画風の強さ ／ <code>--v</code> バージョン指定</td>
+          <td><code>girl reading a book by a café window, rainy evening, watercolor, muted pastel --ar 16:9 --no text</code></td>
+        </tr>
+        <tr>
+          <td><strong>Stable Diffusion</strong><small>タグ型</small></td>
+          <td>英単語のタグを重要な順に並べる。ネガティブプロンプト欄に「出てほしくないもの」を書く。</td>
+          <td><code>(keyword:1.3)</code> で強調（1.0が基準）。ネガティブ欄に <code>lowres, blurry, extra fingers, watermark</code> など。</td>
+          <td><code>1girl, short black hair, (yellow raincoat:1.2), reading book, café window, rain, watercolor</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="builder">
+  <div class="sec-head">
+    <span class="eyebrow">選ぶだけでプロンプトになる</span>
+    <h2>イラストプロンプト組み立て機</h2>
+    <p>主題を書いて項目を選ぶと、会話型向け（日本語）とキーワード型向け（英語）の両方を作ります。</p>
+  </div>
+  <div class="builder">
+    <form class="panel" id="bform" autocomplete="off">
+      <div class="field"><label for="b-jp">主題（日本語）</label><input id="b-jp" value="窓辺で丸くなって眠る白い猫"></div>
+      <div class="field"><label for="b-en">主題（英語）<span style="font-weight:400"> キーワード型で使います</span></label><input id="b-en" value="a white cat curled up asleep on a windowsill"></div>
+      <div class="row2">
+        <div class="field"><label for="b-shot">寄り・引き</label><select id="b-shot"></select></div>
+        <div class="field"><label for="b-angle">アングル</label><select id="b-angle"></select></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="b-light">光</label><select id="b-light"></select></div>
+        <div class="field"><label for="b-color">色味</label><select id="b-color"></select></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="b-style">画風</label><select id="b-style"></select></div>
+        <div class="field"><label for="b-ar">縦横比</label><select id="b-ar"></select></div>
+      </div>
+      <div class="field"><label for="b-no">入れたくないもの（任意）</label><input id="b-no" placeholder="例：文字、人" value="文字"></div>
+    </form>
+    <div class="panel">
+      <div class="out copybox"><div class="out-h"><b>会話型<small>ChatGPT・Gemini</small></b><button class="cp" type="button">コピー</button></div><pre class="copy-src" id="o-jp"></pre></div>
+      <div class="out copybox"><div class="out-h"><b>キーワード型<small>Midjourney</small></b><button class="cp" type="button">コピー</button></div><pre class="copy-src" id="o-mj"></pre></div>
+      <div class="out copybox"><div class="out-h"><b>タグ型<small>Stable Diffusion のプロンプト</small></b><button class="cp" type="button">コピー</button></div><pre class="copy-src" id="o-sd"></pre></div>
+      <div class="out copybox"><div class="out-h"><b>ネガティブプロンプト<small>Stable Diffusion</small></b><button class="cp" type="button">コピー</button></div><pre class="copy-src" id="o-neg"></pre></div>
+    </div>
+  </div>
+</section>
+
+<p class="empty wrap" id="emptyMsg">一致する項目がありません。別のキーワードで試してください。</p>
+</main>
+
+<footer><div class="wrap">プロンプト早見帳 ・ 画像生成の効き方はモデルやバージョンで変わります。うまくいかない時は語順を入れ替えたり、言葉を言い換えたりして試してください。</div></footer>
+
+<script>
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- rules ---------- */
+const RULES = [
+  ['目的を伝える','「何のために」があると、AIが優先順位を判断できます。','メールを書いて','取引先に納期の延長をお願いするメールを書いて。関係を悪くしたくない。'],
+  ['読む人を伝える','同じ内容でも、相手で言葉選びが変わります。','AIについて説明して','AIを使ったことがない60代の親に、LINEで送れる長さで説明して。'],
+  ['完成形を指定する','形式・長さ・トーンを決めておくと、手直しが減ります。','まとめて','表にまとめて。列は「名前・価格・特徴」。'],
+  ['例を見せる','言葉で説明するより、見本を1〜2個見せる方が早く伝わります。','キャッチーなタイトルを考えて','こんな感じのタイトルを10個：「3分でわかる〇〇」「〇〇をやめたら起きたこと」'],
+  ['やらないことも書く','避けたいことを書くと、的外れな答えが減ります。','簡単に説明して','専門用語を使わず、3文以内で説明して。'],
+  ['足りない情報は聞いてもらう','大きな依頼は、いきなり作らせずに質問から始めると精度が上がります。','企画書を作って','新サービスの企画書を作りたい。足りない情報があれば、作る前に質問して。'],
+  ['直すときは差分で伝える','どこを・どう変えるかだけ伝え、残す部分も明記します。','なんか違う、やり直して','2段落目だけ半分の長さにして。他はそのまま。'],
+];
+document.getElementById('rulesList').innerHTML = RULES.map(([t,d,b,g]) => `
+  <div class="rule" data-s="${esc(t+d+b+g)}">
+    <div><h4>${esc(t)}</h4><p>${esc(d)}</p></div>
+    <div class="ex bad"><b>× あいまい</b>${esc(b)}</div>
+    <div class="ex good copybox"><b>○ 伝わる</b><span class="copy-src">${esc(g)}</span></div>
+  </div>`).join('');
+
+/* ---------- templates ---------- */
+const TPL = [
+  ['文章','文章を書く','メール・お知らせ・紹介文など',
+`【目的】のための文章を書いてください。
+読む人：【誰が読むか】
+伝えたいこと：
+- 【要点1】
+- 【要点2】
+トーン：【丁寧／カジュアル／親しみやすく】
+長さ：【300字程度】
+避けてほしいこと：【専門用語、絵文字 など】`],
+  ['文章','文章を直す','読みにくい文章の手直し',
+`次の文章を直してください。
+優先すること：【読みやすさ／短く／丁寧に】
+変えないこと：【言いたい内容、固有名詞】
+直したあと、変更点を箇条書きで教えてください。
+
+---
+【元の文章】`],
+  ['文章','要約する','長い資料・議事録・記事',
+`次の内容を要約してください。
+使う人・場面：【上司が30秒で判断する】
+形式：結論 → 理由 → 次にやること の順で【3行】
+省いてよいもの：【経緯の細かい部分】
+
+---
+【元の内容】`],
+  ['考える','アイデアを出す','企画・ネーミング・ネタ出し',
+`【テーマ】のアイデアを【10】個出してください。
+条件：【予算・期間・対象者など】
+方向性はなるべくバラバラにして、それぞれ一言で狙いも添えてください。
+最後に、おすすめを3つ選んで理由を教えてください。`],
+  ['考える','比較して決める','ツール選び・買い物・進め方',
+`【AとB】を比較してください。
+比較の軸：【価格／手間／将来性】
+私の状況：【前提・制約】
+表で比較したあと、私の状況ならどちらが良いか結論も出してください。
+情報が古い可能性がある部分は、その旨も書いてください。`],
+  ['考える','壁打ちしてもらう','考えがまとまらないとき',
+`【やりたいこと】について考えを整理したいです。
+いきなり答えを出さず、まず私に質問を1つずつしてください。
+5問くらい答えたら、内容をまとめて次の一手を提案してください。`],
+  ['考える','教えてもらう','新しいことを学ぶとき',
+`【知りたいこと】を教えてください。
+私のレベル：【まったくの初心者／少し触ったことがある】
+身近な例えを使って、まず全体像を3行で、そのあと詳しく説明してください。
+最後に理解度チェックの問題を1つ出してください。`],
+  ['開発','機能を追加する','Claude Code などでの実装依頼',
+`【アプリ名】に【機能】を追加したいです。
+目的：【なぜ必要か・誰が使うか】
+完成の条件：
+- 【〇〇すると△△になる】
+- 【既存の××は今まで通り動く】
+参考にしてほしい既存コード：【ファイル名】
+今回やらないこと：【見た目の調整 など】
+まず方針を説明してから実装してください。`],
+  ['開発','バグを直す','動かない・おかしいとき',
+`バグを直してください。
+起きていること：【〇〇を押すと△△になる】
+本来の動き：【□□になってほしい】
+再現手順：
+1. 【】
+2. 【】
+エラーメッセージ：
+【そのまま貼り付け】
+最近変えたこと：【あれば】
+原因を説明してから修正してください。`],
+  ['開発','コードを見てもらう','レビュー・改善点の洗い出し',
+`【ファイル名／変更内容】をレビューしてください。
+特に見てほしい点：【バグ／読みやすさ／速度】
+重要度の高い順に、問題点と修正案を出してください。
+細かい好みの問題は、最後に短くまとめてください。`],
+  ['発信','Note記事を書く','体験談・ノウハウ記事',
+`Note記事の下書きを書いてください。
+テーマ：【】
+読者：【どんな悩みを持っている人か】
+読んだあと感じてほしいこと：【】
+入れたいエピソード：
+- 【自分の体験】
+構成：導入（共感）→ 本題 → まとめ（行動のきっかけ）
+文字数：【2000字程度】
+文体：【です・ます、親しみやすく】`],
+  ['発信','X（旧Twitter）に投稿する','告知・日常・ノウハウ',
+`次の内容でXの投稿文を【5】パターン作ってください。
+伝えたいこと：【】
+狙い：【いいね／リンクのクリック／フォロー】
+条件：140字以内、1行目で手を止めさせる、ハッシュタグは【0〜2個】
+パターンごとに切り口（共感・数字・問いかけ など）を変えてください。`],
+];
+const CATS = ['すべて', ...new Set(TPL.map(t => t[0]))];
+let curCat = 'すべて';
+document.getElementById('tplList').innerHTML = TPL.map(([c,t,w,body]) => `
+  <article class="tpl copybox" data-cat="${esc(c)}" data-s="${esc(c+t+w+body)}">
+    <div class="tpl-h"><div><span class="cat">${esc(c)}</span><h4>${esc(t)}</h4><p>${esc(w)}</p></div><button class="cp" type="button">コピー</button></div>
+    <pre class="copy-src">${esc(body).replace(/【[^】]*】/g, m => `<mark>${m}</mark>`)}</pre>
+  </article>`).join('');
+const catTabs = document.getElementById('catTabs');
+catTabs.innerHTML = CATS.map(c => `<button type="button" aria-pressed="${c===curCat}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+catTabs.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  curCat = b.dataset.cat;
+  catTabs.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  applyFilter();
+});
+
+/* ---------- demo drawings ---------- */
+const PERSON = `
+<rect x="-400" y="196" width="900" height="300" class="gnd"/>
+<circle cx="-95" cy="-25" r="18" class="sun"/>
+<rect x="-128" y="130" width="10" height="66" class="trunk"/><circle cx="-123" cy="116" r="30" class="leaf"/>
+<rect x="214" y="142" width="9" height="54" class="trunk"/><circle cx="218" cy="128" r="24" class="leaf"/>
+<path d="M50 120 L38 194 M50 120 L62 194" class="limb"/>
+<path d="M36 64 L20 112 M64 64 L80 112" class="limb"/>
+<rect x="33" y="52" width="34" height="72" rx="12" class="body"/>
+<circle cx="50" cy="34" r="17" class="head"/>
+<path d="M33 33 Q34 15 50 16 Q66 15 67 33 Q61 23 50 24 Q39 23 33 33Z" class="hair"/>
+<circle cx="44" cy="35" r="2.2" class="eye"/><circle cx="56" cy="35" r="2.2" class="eye"/>
+<path d="M45.5 42 Q50 45.5 54.5 42" class="mouth"/>`;
+const shot = vb => `<svg viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${PERSON}</svg>`;
+
+function angle(cx, cy, label){
+  const hx = 104, hy = 60;
+  const a = Math.atan2(hy - cy, hx - cx) * 180 / Math.PI;
+  return `<svg viewBox="0 0 160 120" aria-hidden="true">
+    <rect x="0" y="104" width="160" height="16" class="gnd"/>
+    <path d="M${cx} ${cy} L${hx} ${hy}" class="sight"/>
+    <path d="M104 80 L99 103 M104 80 L109 103" class="limb" style="stroke-width:1.6"/>
+    <rect x="97" y="66" width="14" height="17" rx="5" class="body" style="stroke-width:1.4"/>
+    <circle cx="104" cy="58" r="7.5" class="head" style="stroke-width:1.4"/>
+    <g transform="translate(${cx} ${cy}) rotate(${a})"><rect x="-9" y="-6" width="14" height="12" rx="2" class="cam"/><path d="M5 -4 L11 -7 L11 7 L5 4Z" class="cam"/></g>
+    ${label ? `<text x="${cx}" y="${cy < 30 ? cy + 20 : cy - 12}" text-anchor="middle" font-size="8" fill="currentColor" style="color:var(--muted)">${label}</text>` : ''}
+  </svg>`;
+}
+const dutch = `<div style="position:absolute;inset:-12%;transform:rotate(-12deg)">${shot('8 8 84 63')}</div>`;
+
+const light = (cls, extra='') => `<div class="lt ${cls}">${extra}<div class="floor"></div><div class="orb"></div></div>`;
+const bokeh = `<div class="lt l-bokeh">
+  <i style="width:22%;aspect-ratio:1;left:4%;top:8%;background:#F7B267"></i>
+  <i style="width:14%;aspect-ratio:1;left:72%;top:12%;background:#F4845F"></i>
+  <i style="width:18%;aspect-ratio:1;left:78%;top:58%;background:#7FD1E8"></i>
+  <i style="width:12%;aspect-ratio:1;left:12%;top:64%;background:#FFE29A"></i>
+  <i style="width:9%;aspect-ratio:1;left:58%;top:6%;background:#C3A5F5"></i>
+  <div class="orb"></div></div>`;
+
+const sw = cols => `<div class="sw">${cols.map(c => `<span style="background:${c}"></span>`).join('')}</div>`;
+const ar = (w, h, use) => `<div class="ar-wrap"><div class="ar" style="aspect-ratio:${w}/${h};${w>=h?'width:100%':'height:100%'}">${w}:${h}</div></div>`;
+
+function scene(mode){
+  const line = mode === 'line';
+  const f = c => line ? 'fill="none" stroke="#222" stroke-width="1.6" stroke-linejoin="round"' : `fill="${c}"`;
+  return `<svg viewBox="0 0 160 120" aria-hidden="true" ${mode==='wc' ? 'style="filter:url(#wc)"' : ''}>
+    <rect width="160" height="120" fill="${line ? '#FBFBF8' : (mode==='wc' ? '#CFE6F0' : '#BFE3F2')}"/>
+    <circle cx="122" cy="30" r="14" ${f(mode==='wc' ? '#F6CF6A' : '#F7C548')}/>
+    <path d="M0 90 Q40 60 80 85 T160 80 V120 H0Z" ${f(mode==='wc' ? '#9ACB8F' : '#7BC47F')}/>
+    <path d="M0 106 Q50 86 100 101 T160 99 V120 H0Z" ${f(mode==='wc' ? '#6EAE73' : '#4E9F5A')}/>
+    <rect x="40" y="72" width="30" height="26" ${f('#F2EDE4')}/>
+    <path d="M36 74 L55 57 L74 74Z" ${f(mode==='wc' ? '#E07A6E' : '#D9534F')}/>
+    <rect x="51" y="84" width="8" height="14" ${f('#8A5A3B')}/>
+  </svg>`;
+}
+function pixel(){
+  const m = ['..XX...XX..','.XoXX.XXXX.','XoXXXXXXXXX','XXXXXXXXXXX','XXXXXXXXXXX','.XXXXXXXXX.','..XXXXXXX..','...XXXXX...','....XXX....','.....X.....'];
+  let r = '';
+  m.forEach((row, y) => [...row].forEach((ch, x) => {
+    if (ch !== '.') r += `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${ch==='o' ? '#FFD1DC' : '#E8415F'}"/>`;
+  }));
+  return `<svg viewBox="-1.5 -0.25 14 10.5" shape-rendering="crispEdges" aria-hidden="true"><rect x="-2" y="-1" width="20" height="14" fill="#2A2140"/>${r}</svg>`;
+}
+const iso = `<svg viewBox="0 0 160 120" aria-hidden="true"><rect width="160" height="120" fill="#E9EDF5"/>
+  <path d="M80 18 L122 42 L80 66 L38 42Z" fill="#8FB7FF"/><path d="M38 42 L80 66 L80 106 L38 82Z" fill="#4F7FE0"/><path d="M122 42 L80 66 L80 106 L122 82Z" fill="#3260C2"/>
+  <path d="M80 66 L80 106" stroke="#fff" stroke-opacity=".3"/></svg>`;
+const lowpoly = `<svg viewBox="0 0 160 120" aria-hidden="true"><rect width="160" height="120" fill="#F3D9C5"/>
+  <path d="M0 120 L45 40 L70 75Z" fill="#5C6B8A"/><path d="M45 40 L90 70 L70 75Z" fill="#7A89A8"/><path d="M0 120 L70 75 L60 120Z" fill="#46536E"/>
+  <path d="M70 75 L110 28 L130 70Z" fill="#8E9CBA"/><path d="M110 28 L160 80 L130 70Z" fill="#6A7896"/><path d="M60 120 L70 75 L130 70 L120 120Z" fill="#56637F"/>
+  <path d="M120 120 L130 70 L160 80 L160 120Z" fill="#3E4A63"/><path d="M110 28 L118 40 L104 36Z" fill="#fff"/><path d="M45 40 L52 50 L40 49Z" fill="#fff"/></svg>`;
+const lineart = scene('line');
+
+function comp(kind){
+  const g = `<path d="M53.3 0V120M106.7 0V120M0 40H160M0 80H160" class="guide"/>`;
+  const body = {
+    thirds: `${g}<path d="M0 80 H160" class="ln"/><rect x="50" y="52" width="6.6" height="28" class="trunk"/><circle cx="53.3" cy="44" r="14" class="leaf"/><circle cx="53.3" cy="40" r="2.6" class="acc"/>`,
+    center: `<path d="M80 0V120M0 60H160" class="guide"/><path d="M0 92 H160" class="ln"/><path d="M80 24 L104 92 H56Z" class="soft"/><path d="M80 24 L104 92 H56Z" class="accs"/>`,
+    leading: `<path d="M0 46 H160" class="ln"/><path d="M30 120 L78 46 L82 46 L130 120Z" class="soft"/><path d="M30 120 L78 46 M130 120 L82 46" class="ln"/><path d="M80 120 L80 104 M80 96 L80 84 M80 76 L80 68 M80 62 L80 56" stroke="var(--mark)" stroke-width="2"/><circle cx="80" cy="46" r="3" class="acc"/>`,
+    space: `<path d="M0 100 H160" class="ln" style="opacity:.4"/><rect x="128" y="86" width="4" height="14" class="trunk"/><circle cx="130" cy="82" r="5" class="leaf"/><circle cx="34" cy="28" r="6" class="sun"/>`,
+    diagonal: `<path d="M0 120 L160 0" class="guide" style="stroke-dasharray:none;opacity:.5"/><circle cx="30" cy="97" r="9" class="leaf"/><circle cx="76" cy="63" r="7" class="leaf"/><circle cx="116" cy="33" r="5" class="leaf"/><circle cx="146" cy="10" r="3.5" class="acc"/>`,
+  }[kind];
+  return `<svg viewBox="0 0 160 120" aria-hidden="true" style="background:var(--surface)">${body}</svg>`;
+}
+
+/* ---------- keyword groups ---------- */
+const KW = [
+  {g:'寄り・引き（ショットサイズ）', d:'どこまで画面に入れるか。人物の印象がいちばん変わる要素です。', items:[
+    ['超アップ','extreme close-up','目や口元だけ。感情や質感を強く見せたいときに。', shot('37 25 26 19.5')],
+    ['アップ','close-up','顔がメイン。表情を伝えたいアイコンやサムネに。', shot('24 9 52 39')],
+    ['バストアップ','medium shot / bust shot','胸から上。キャラ紹介や会話シーンの定番。', shot('8 6 84 63')],
+    ['全身','full body shot','頭から足まで。服装やポーズを見せたいときに。', shot('-92 -6 284 213')],
+    ['引き','wide shot','人物は小さく、場所や空気感が主役。', shot('-210 -70 520 390')],
+  ]},
+  {g:'カメラアングル', d:'どこから見るかで、強さ・かわいさ・不安感などが変わります。', items:[
+    ['アイレベル','eye level shot','目線の高さ。自然で落ち着いた印象。', angle(26, 60)],
+    ['ハイアングル（俯瞰）','high angle shot','上から見下ろす。小さく、かわいく、弱く見える。', angle(36, 14)],
+    ['ローアングル（あおり）','low angle shot','下から見上げる。大きく、強く、堂々と見える。', angle(28, 100)],
+    ['真上から','top-down view / bird\'s-eye view','真上から。料理・机の上・地図っぽい絵に。', angle(104, 10)],
+    ['傾けた構図','dutch angle','画面を斜めに。不安・緊張・勢いを出したいときに。', dutch],
+  ]},
+  {g:'光', d:'光の向きと色で、時間帯と雰囲気が決まります。', items:[
+    ['やわらかい光','soft lighting','影が薄く、やさしい印象。商品・人物どちらにも無難。', light('l-soft')],
+    ['逆光','backlighting','後ろからの光。輪郭が光り、エモい雰囲気に。', light('l-back')],
+    ['リムライト','rim lighting','暗い背景で輪郭だけ光らせる。かっこいい・神秘的。', light('l-rim')],
+    ['夕方の光','golden hour','オレンジ色の低い光。ノスタルジック・あたたかい。', light('l-gold')],
+    ['ドラマチックな光','dramatic lighting, chiaroscuro','明暗をくっきり。シリアス・重厚な雰囲気。', light('l-drama')],
+    ['ネオン','neon lighting','ピンクと水色の人工光。夜の街・サイバーパンク。', light('l-neon')],
+    ['光の筋','volumetric light, god rays','差し込む光の筋。神秘的・幻想的。', light('l-vol')],
+    ['背景ぼかし','bokeh, shallow depth of field','背景を丸くぼかして主役を目立たせる。', bokeh],
+  ]},
+  {g:'構図', d:'主役をどこに置くか。指定すると画面の安定感が変わります。', items:[
+    ['三分割構図','rule of thirds','線の交点に主役を置く。バランスが良く失敗しにくい。', comp('thirds')],
+    ['日の丸構図（中央）','centered composition, symmetrical','真ん中にドン。力強い・アイコン的。', comp('center')],
+    ['奥へ伸びる線','leading lines','道や線で視線を奥へ誘導。奥行きが出る。', comp('leading')],
+    ['余白を活かす','negative space, minimalist','主役を小さく、余白を大きく。文字を載せたい時にも。', comp('space')],
+    ['対角線構図','diagonal composition','斜めに配置して動きを出す。', comp('diagonal')],
+  ]},
+  {g:'色味', d:'色の方向性をひとことで指定できます。', items:[
+    ['パステル','pastel colors','淡くやさしい。かわいい・春っぽい。', sw(['#F8C8DC','#C9E4F5','#D7F0C8','#FFF1B8','#E3D3F5'])],
+    ['ビビッド','vibrant colors, high saturation','鮮やかで元気。ポップ・広告向き。', sw(['#FF3B5C','#FFB800','#00C2A8','#2F6BFF','#A43BFF'])],
+    ['くすみカラー','muted colors, desaturated','落ち着いた大人っぽさ。おしゃれ系。', sw(['#9C8F86','#8FA3A0','#B5A58D','#7E8A99','#A68C8C'])],
+    ['モノクロ','monochrome, black and white','白黒。シリアス・クラシック。', sw(['#111111','#444444','#777777','#AAAAAA','#DDDDDD'])],
+    ['セピア','sepia tone','古い写真風。思い出・レトロ。', sw(['#3B2A1E','#6B4F36','#9C7A57','#C9AA82','#EAD9BD'])],
+    ['補色の組み合わせ','complementary colors, blue and orange','反対色でメリハリ。映画っぽい色。', sw(['#1F4FD1','#3E6BE6','#F2F2F2','#F2A541','#E07B10'])],
+  ]},
+  {g:'画風', d:'同じ題材でも、画風の一言で仕上がりが大きく変わります。', items:[
+    ['フラットイラスト','flat illustration, vector art','影なし・ベタ塗り。資料・アイコン・Web素材に。', scene('flat')],
+    ['線画','line art','線だけ。塗り絵・ロゴのラフ・シンプルな挿絵に。', lineart],
+    ['水彩','watercolor illustration','にじみと透明感。やさしい絵本風。', scene('wc')],
+    ['ドット絵','pixel art','ゲーム風のカクカクした絵。レトロ・ポップ。', pixel()],
+    ['アイソメトリック','isometric 3D','斜め上からの立体図。部屋・街・図解に。', iso],
+    ['ローポリ','low poly','三角形の面で作る立体。シンプルでモダン。', lowpoly],
+  ]},
+  {g:'縦横比', d:'使う場所に合わせて最初に決めておくと、構図が崩れにくくなります。', items:[
+    ['正方形','1:1 / square','SNSアイコン、Instagramの投稿。', ar(1,1)],
+    ['横長','16:9','YouTubeサムネ、スライド、ブログのヘッダー。', ar(16,9)],
+    ['縦長','9:16','スマホ壁紙、ストーリーズ、ショート動画。', ar(9,16)],
+    ['やや縦長','4:5','Instagramのフィード（縦）。', ar(4,5)],
+    ['写真の比率','3:2','一眼カメラの写真っぽい比率。Noteの見出し画像にも。', ar(3,2)],
+  ]},
+];
+document.getElementById('kwGroups').innerHTML = KW.map(grp => `
+  <div class="kwgroup">
+    <h3 class="group">${esc(grp.g)} <small>${esc(grp.d)}</small></h3>
+    <div class="grid">${grp.items.map(([jp,en,note,demo]) => `
+      <article class="kw" data-s="${esc(grp.g+jp+en+note)}">
+        <div class="demo">${demo}</div>
+        <div class="kw-b">
+          <h4>${esc(jp)} <span class="en">${esc(en)}</span></h4>
+          <p>${esc(note)}</p>
+          <div class="snip copybox"><code class="copy-src">${esc(en.split(' / ')[0])}</code><button class="cp" type="button">コピー</button></div>
+        </div>
+      </article>`).join('')}</div>
+  </div>`).join('');
+
+/* ---------- tips ---------- */
+const TIPS = [
+  ['入れたい文字は " " で囲む','看板やポスターの文字は、引用符で囲むと正確に入りやすくなります（特にChatGPT・Gemini）。','a café sign with the text "OPEN" in white letters'],
+  ['「〜しない」より「欲しいもの」を書く','「人を入れない」と書くと、かえって人が出ることがあります。欲しい状態を書くか、除外用の欄・--no を使います。','empty street at dawn, no people'],
+  ['要素を盛りすぎない','要素が多いほど、どれかが無視されます。主題＋5〜7個くらいが目安。足りなければ後から追加します。','1回目：主題・場所・画風だけ → 2回目：光や小物を足す'],
+  ['キャラを揃えるなら同じ言葉で','シリーズで同じキャラを出すときは、髪・服・色の説明を毎回まったく同じ文言にします。最初の画像を参考画像として渡すとさらに安定します。','short black hair, round glasses, yellow raincoat, red backpack'],
+  ['直すときは残すものも書く','会話型のAIでは「ここはそのまま、ここだけ変えて」と伝えると、良かった部分が崩れにくくなります。','人物とポーズはそのまま、背景だけ夕暮れの海辺に変えて'],
+  ['「〇〇風」より特徴を言葉で','作家名や作品名に頼るより、線・塗り・色の特徴を書く方が狙い通りになりやすく、権利面でも安心です。','thick outlines, flat colors, retro 80s palette, halftone texture'],
+  ['日本語か英語か','ChatGPT・Geminiは日本語で十分伝わります。MidjourneyやStable Diffusionは英語の方が安定します。翻訳もAIに頼めます。','このプロンプトを画像生成用の英語キーワードに変換して：【日本語の説明】'],
+  ['画質ワードは効き目を見て','"highly detailed" "sharp focus" などは昔ほど効かないこともあります。入れて変わらなければ外してOK。','highly detailed, sharp focus'],
+];
+document.getElementById('tipsList').innerHTML = TIPS.map(([t,d,e]) => `
+  <div class="tip" data-s="${esc(t+d+e)}">
+    <h4>${esc(t)}</h4><p>${esc(d)}</p>
+    <div class="ex good copybox snip" style="background:var(--good-soft)"><code class="copy-src">${esc(e)}</code><button class="cp" type="button">コピー</button></div>
+  </div>`).join('');
+
+const WORDS = [
+  ['アニメ調','anime style'],['厚塗り','painterly, thick brush strokes'],['油絵','oil painting'],['鉛筆スケッチ','pencil sketch'],
+  ['絵本風','children\'s book illustration'],['浮世絵風','ukiyo-e style'],['切り絵','paper cut-out art'],['クレイアニメ','claymation style'],
+  ['3DCG','3D render'],['ちびキャラ','chibi'],['写真風','photorealistic'],['映画のワンシーン','cinematic still'],
+  ['レトロポスター','vintage poster'],['ステッカー風','sticker design, white border'],['アイコン用','app icon, simple, centered'],['ガラス・透明感','glassmorphism, translucent'],
+];
+document.getElementById('wordBank').innerHTML = WORDS.map(([j,e]) => `
+  <span class="word copybox" data-s="${esc(j+e)}">${esc(j)} <code class="copy-src">${esc(e)}</code><button class="cp" type="button">コピー</button></span>`).join('');
+
+/* ---------- builder ---------- */
+const OPT = {
+  shot:[['指定なし','',''],['アップ','顔のアップ','close-up'],['バストアップ','胸から上','medium shot'],['全身','全身','full body shot'],['引き','引きの構図','wide shot']],
+  angle:[['指定なし','',''],['アイレベル','目線の高さから','eye level'],['ハイアングル','上から見下ろす角度で','high angle'],['ローアングル','下から見上げる角度で','low angle'],['真上から','真上から見た構図で','top-down view']],
+  light:[['指定なし','',''],['やわらかい光','やわらかい光','soft lighting'],['夕方の光','夕方のオレンジ色の光','golden hour'],['逆光','逆光','backlighting'],['ネオン','ネオンの光','neon lighting'],['ドラマチック','明暗のくっきりした光','dramatic lighting']],
+  color:[['指定なし','',''],['パステル','パステルカラー','pastel colors'],['ビビッド','鮮やかな色','vibrant colors'],['くすみカラー','くすんだ落ち着いた色','muted colors'],['モノクロ','白黒','monochrome']],
+  style:[['指定なし','',''],['水彩','水彩画風','watercolor illustration'],['フラット','フラットイラスト','flat illustration'],['アニメ調','アニメ調','anime style'],['ドット絵','ドット絵','pixel art'],['3DCG','3DCG','3D render'],['線画','線画','line art']],
+  ar:[['指定なし','',''],['1:1 正方形','正方形','1:1'],['16:9 横長','横長（16:9）','16:9'],['9:16 縦長','縦長（9:16）','9:16'],['4:5 やや縦長','やや縦長（4:5）','4:5']],
+};
+const DEF = {shot:1, angle:0, light:1, color:1, style:1, ar:2};
+for (const k in OPT){
+  const s = document.getElementById('b-' + k);
+  s.innerHTML = OPT[k].map((o,i) => `<option value="${i}">${esc(o[0])}</option>`).join('');
+  s.value = DEF[k];
+}
+const v = id => document.getElementById(id).value.trim();
+function build(){
+  const pick = k => OPT[k][+document.getElementById('b-' + k).value];
+  const P = {}; for (const k in OPT) P[k] = pick(k);
+  const jp = v('b-jp') || '【描きたいもの】', en = v('b-en') || '[subject]', no = v('b-no');
+
+  let s = `${jp}の${P.style[1] ? P.style[1] + 'の' : ''}イラストを描いてください。`;
+  const cam = [P.shot[1], P.angle[1]].filter(Boolean);
+  if (cam.length) s += `\n構図：${cam.join('、')}。`;
+  if (P.light[1]) s += `\n光：${P.light[1]}。`;
+  if (P.color[1]) s += `\n色味：${P.color[1]}。`;
+  if (P.ar[1]) s += `\n縦横比：${P.ar[1]}。`;
+  if (no) s += `\n${no}は入れないでください。`;
+  document.getElementById('o-jp').textContent = s;
+
+  const kw = [en, P.style[2], P.shot[2], P.angle[2], P.light[2], P.color[2]].filter(Boolean).join(', ');
+  const noEn = no ? ' --no ' + no : '';
+  document.getElementById('o-mj').textContent = kw + (P.ar[2] ? ' --ar ' + P.ar[2] : '') + noEn + (no && /[^\x00-\x7F]/.test(no) ? '\n（--no の後ろは英語に直すと確実です。例：文字 → text）' : '');
+  document.getElementById('o-sd').textContent = [en, P.style[2] ? `(${P.style[2]}:1.2)` : '', P.shot[2], P.angle[2], P.light[2], P.color[2]].filter(Boolean).join(', ');
+  document.getElementById('o-neg').textContent = 'lowres, blurry, bad anatomy, extra fingers, watermark, signature' + (no ? ', ' + no : '');
+}
+document.getElementById('bform').addEventListener('input', build);
+document.getElementById('bform').addEventListener('submit', e => e.preventDefault());
+build();
+
+/* ---------- copy ---------- */
+document.addEventListener('click', async e => {
+  const b = e.target.closest('.cp'); if (!b) return;
+  const src = b.closest('.copybox').querySelector('.copy-src');
+  const text = src.textContent;
+  const ok = () => { b.textContent = 'コピー済み'; b.classList.add('done'); setTimeout(() => { b.textContent = 'コピー'; b.classList.remove('done'); }, 1400); };
+  try { await navigator.clipboard.writeText(text); ok(); }
+  catch { const r = document.createRange(); r.selectNodeContents(src); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = '選択しました'; setTimeout(() => b.textContent = 'コピー', 1800); }
+});
+
+/* ---------- filter ---------- */
+const q = document.getElementById('q');
+function applyFilter(){
+  const t = q.value.trim().toLowerCase();
+  let any = false;
+  document.querySelectorAll('[data-s]').forEach(el => {
+    const catOk = !el.dataset.cat || curCat === 'すべて' || el.dataset.cat === curCat;
+    const hit = catOk && (!t || el.dataset.s.toLowerCase().includes(t));
+    el.classList.toggle('is-hidden', !hit);
+    if (hit) any = true;
+  });
+  document.querySelectorAll('.kwgroup').forEach(g => g.classList.toggle('is-hidden', !g.querySelector('.kw:not(.is-hidden)')));
+  document.querySelectorAll('main section').forEach(sec => {
+    if (!t) { sec.classList.remove('is-hidden'); return; }
+    sec.classList.toggle('is-hidden', !sec.querySelector('[data-s]:not(.is-hidden)'));
+  });
+  const ill = document.getElementById('illust');
+  ill.querySelectorAll('h3.group').forEach(h => {
+    const next = h.nextElementSibling;
+    if (next && (next.id === 'tipsList' || next.id === 'wordBank')) h.classList.toggle('is-hidden', !!t && !next.querySelector('[data-s]:not(.is-hidden)'));
+  });
+  document.getElementById('emptyMsg').style.display = any ? 'none' : 'block';
+}
+q.addEventListener('input', applyFilter);
+
+/* ---------- active tab ---------- */
+const links = [...document.querySelectorAll('.tabs a')];
+const io = new IntersectionObserver(es => es.forEach(en => {
+  if (en.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id));
+}), {rootMargin:'-30% 0px -60% 0px'});
+document.querySelectorAll('main section').forEach(s => io.observe(s));
+</script>
+</body>
+</html>
